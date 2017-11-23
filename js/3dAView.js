@@ -1,5 +1,5 @@
 /*!
- * 3dA v1.0.1 ~ Copyright (c) Ajaxson, 2017/11/23/ Email Ajaxson@163.com
+ * 3dAView v1.0.1 ~ Copyright (c) Ajaxson, 2017/11/23/ Email Ajaxson@163.com
  * 如有什么问题，请github 留言 或者 邮件
 */
 
@@ -13,6 +13,11 @@
 @param(maxImage)  		//最大的图片名称数量 类型：number; 必填
 @param(firstView)  		//默认显示第几张 类型：number; 默认:1； 可选
 @param(oneRange)  		//多少距离触发显示上/下一张 类型：number; 默认:20px； 可选
+@param(setLoadingCall)  //加载中回调 类型：function; 默认: null； 可选
+@param(loadCompleteCall) //多少距离触发显示上/下一张 类型：function; 默认:null； 可选
+@param(isPrev)  		//到了上一张回调 类型：function; 默认: null； 可选
+@param(isNext) 			//到了下一张回调 类型：function; 默认:null； 可选
+@param(isChange) 			//到了上一张/下一张回调 类型：function; 默认:null； 可选
 */
 
 /*********************封装*******************/
@@ -29,11 +34,17 @@
 			max: options.maxImage,
 			i: options.firstView || 1,
 			oneRange: options.oneRange || 20,
+			setLoadingCall: options.setLoadingCall || '',
+			loadCompleteCall: options.loadCompleteCall || '',
+			isPrev: options.isPrev || '',
+			isNext: options.isNext || '',
+			isChange: options.isChange || ''
 		}
 
 
 		/**************************系统初始化配置,非人为修改************************************/
 		that.imgArray = [],		//初始图片数组
+		that.loadP = 0;			//图片加载进度
 		that.down = null;		//是否暗了下去
 		that.aboutE = {			//鼠标各参数
 						downEx: 0,
@@ -50,8 +61,18 @@
 		that.imgArray = that._imgArrayCreat(that.base.part, that.base.type, that.base.mix, that.base.max);
 		// 加载完后回调
 		that._loadImg(that.imgArray,function(){		
+			// 加载完
 			that._defaultView(that.base.i);
 			that._touchAndDo(that._touchOrMouse());
+			if(that.base.loadCompleteCall && typeof(that.base.loadCompleteCall) == "function"){
+				that.base.loadCompleteCall();
+			};
+		},function(p){
+			// 加载中
+			that.loadP = p;
+			if(that.base.setLoadingCall && typeof(that.base.setLoadingCall) == "function"){
+				that.base.setLoadingCall();
+			};
 		})
 	
 	}
@@ -185,12 +206,26 @@
 				that.aboutE.downEx = m;
 				that.base.i = --that.base.i < that.base.mix ? that.base.max : that.base.i;
 				that._defaultView(that.base.i);
+				// 上一张回调
+				if(that.base.isPrev && typeof(that.base.isPrev) == "function"){
+					that.base.isPrev();
+				};
+				if(that.base.isChange && typeof(that.base.isChange) == "function"){
+					that.base.isChange();
+				};
 			} 
 			// 向左滑
 			else if (that.aboutE.downEx - m < -that.base.oneRange) {
 				that.aboutE.downEx = m;
 				that.base.i = ++that.base.i > that.base.max ? that.base.mix : that.base.i;
 				that._defaultView(that.base.i);
+				// 下一张回调
+				if(that.base.isNext && typeof(that.base.isNext) == "function"){
+					that.base.isNext();
+				};
+				if(that.base.isChange && typeof(that.base.isChange) == "function"){
+					that.base.isChange();
+				};
 			}
 		}
 
