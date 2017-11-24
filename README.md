@@ -5,3 +5,4 @@
  如果问题或bug，可交流及反馈
  素材源于网络，如有侵犯，请作者联系告知。
  谢谢。
+<p>预览地址：<a href="https://ajaxson.github.io/3dAView/index.html">https://ajaxson.github.io/3dAView/index.html</a></p>
